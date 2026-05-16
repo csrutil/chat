@@ -105,6 +105,7 @@
     "gchat": "GoogleChat",
     "github": "GitHub",
     "ioredis": "IoRedis",
+    "meshcore": "MeshCore",
     "pg": "Postgres",
     "whatsapp": "WhatsApp"
   }

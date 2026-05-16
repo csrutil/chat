@@ -13,6 +13,7 @@
     "whatsapp",
     "messenger",
     "web",
+    "meshcore",
     "---State---",
     "memory",
     "redis",

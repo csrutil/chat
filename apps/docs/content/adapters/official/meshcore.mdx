@@ -1,0 +1,137 @@
+---
+title: MeshCore
+description: MeshCore Companion Radio adapter for Chat SDK over Node serial.
+packageName: "@chat-adapter/meshcore"
+slug: meshcore
+type: platform
+tagline: Connect a Chat SDK bot to a local MeshCore Companion Radio over USB serial, with support for direct contact messages and channel messages.
+beta: true
+features:
+  postMessage: yes
+  editMessage: no
+  deleteMessage: no
+  fileUploads: no
+  streaming: no
+  scheduledMessages: no
+  cardFormat:
+    status: partial
+    label: Text fallback
+  buttons: no
+  linkButtons: no
+  selectMenus: no
+  tables:
+    status: partial
+    label: Markdown text
+  fields: no
+  imagesInCards: no
+  modals: no
+  slashCommands: no
+  mentions: no
+  addReactions: no
+  removeReactions: no
+  typingIndicator: no
+  directMessages: yes
+  ephemeralMessages: no
+  userLookup:
+    status: partial
+    label: Contact table
+  customApiEndpoint: no
+  fetchMessages:
+    status: partial
+    label: State cache
+  fetchSingleMessage: no
+  fetchThreadInfo:
+    status: yes
+    label: Synthesized
+  fetchChannelMessages:
+    status: partial
+    label: State cache
+  listThreads: no
+  fetchChannelInfo: yes
+  postChannelMessage: no
+---
+
+## Install
+
+<PackageInstall package="@chat-adapter/meshcore" />
+
+## Quick start
+
+Set the serial port path for your Companion Radio:
+
+```bash
+export MESHCORE_SERIAL_PORT=/dev/ttyACM0
+```
+
+Then register the adapter:
+
+```typescript title="lib/bot.ts" lineNumbers
+import { Chat } from "chat";
+import { createMeshCoreAdapter } from "@chat-adapter/meshcore";
+import { createMemoryState } from "@chat-adapter/state-memory";
+
+export const bot = new Chat({
+  userName: "mybot",
+  adapters: {
+    meshcore: createMeshCoreAdapter(),
+  },
+  state: createMemoryState(),
+});
+
+bot.onDirectMessage(async (thread, message) => {
+  await thread.post(`You said: ${message.text}`);
+});
+```
+
+MeshCore is not webhook based. The adapter opens the serial port during Chat initialization, syncs the radio clock, sends a flood advert, and drains waiting text messages into Chat SDK handlers.
+
+## Configuration
+
+<TypeTable
+  type={{
+    serialPort: {
+      type: "string",
+      description:
+        "USB serial port path. Auto-detected from `MESHCORE_SERIAL_PORT`.",
+    },
+    baudRate: {
+      type: "number",
+      default: "115200",
+      description: "Serial baud rate for the Companion Radio connection.",
+    },
+    autoConnect: {
+      type: "boolean",
+      default: "true",
+      description:
+        "Open the serial connection during Chat initialization. Set to `false` for tests or custom lifecycle management.",
+    },
+    syncDeviceTime: {
+      type: "boolean",
+      default: "true",
+      description: "Set the MeshCore device time from the host clock after connecting.",
+    },
+    sendFloodAdvertOnConnect: {
+      type: "boolean",
+      default: "true",
+      description: "Send a flood advert after connecting.",
+    },
+    userName: {
+      type: "string",
+      description: "Bot username override. Defaults to the Chat `userName`.",
+    },
+  }}
+/>
+
+## Thread IDs
+
+Contact threads use the sender public-key prefix:
+
+```text
+meshcore:contact:010203040506
+```
+
+Channel threads use the MeshCore channel index:
+
+```text
+meshcore:channel:0
+```

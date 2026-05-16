@@ -18,6 +18,7 @@ export const VALID_PACKAGE_README_IMPORTS = [
   "@chat-adapter/linear",
   "@chat-adapter/whatsapp",
   "@chat-adapter/messenger",
+  "@chat-adapter/meshcore",
   "@chat-adapter/web",
   "@chat-adapter/web/react",
   "@chat-adapter/state-redis",
@@ -50,6 +51,7 @@ export const VALID_DOC_PACKAGES = [
   "@chat-adapter/linear",
   "@chat-adapter/whatsapp",
   "@chat-adapter/messenger",
+  "@chat-adapter/meshcore",
   "@chat-adapter/web",
   "@chat-adapter/web/react",
   "@chat-adapter/state-redis",
@@ -172,6 +174,9 @@ export function createTempProject(codeBlocks: string[]): string {
         ],
         "@chat-adapter/messenger": [
           join(import.meta.dirname, "../../adapter-messenger/src/index.ts"),
+        ],
+        "@chat-adapter/meshcore": [
+          join(import.meta.dirname, "../../adapter-meshcore/src/index.ts"),
         ],
         "@chat-adapter/state-redis": [
           join(import.meta.dirname, "../../state-redis/src/index.ts"),

@@ -100,6 +100,15 @@
     "readme": "https://github.com/vercel/chat/tree/main/packages/adapter-web"
   },
   {
+    "name": "MeshCore",
+    "slug": "meshcore",
+    "type": "platform",
+    "description": "Connect Chat SDK bots to MeshCore Companion Radio devices over Node serial.",
+    "packageName": "@chat-adapter/meshcore",
+    "beta": true,
+    "readme": "https://github.com/vercel/chat/tree/main/packages/adapter-meshcore"
+  },
+  {
     "name": "Redis",
     "slug": "redis",
     "type": "state",
