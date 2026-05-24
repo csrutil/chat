@@ -1,6 +1,10 @@
 import type { ChatInstance } from "chat";
 import { describe, expect, it, vi } from "vitest";
-import { createMeshCoreAdapter, MeshCoreAdapter } from "./index";
+import {
+  createMeshCoreAdapter,
+  MeshCoreAdapter,
+  MeshCoreTcpConnection,
+} from "./index";
 import type {
   MeshCoreChannel,
   MeshCoreConnection,
@@ -103,6 +107,19 @@ describe("createMeshCoreAdapter", () => {
     expect(adapter).toBeInstanceOf(MeshCoreAdapter);
     expect(adapter.name).toBe("meshcore");
     expect(adapter.persistThreadHistory).toBe(true);
+  });
+
+  it("constructs with TCP config", () => {
+    const adapter = createMeshCoreAdapter({
+      autoConnect: false,
+      tcpHost: "127.0.0.1",
+      tcpPort: 5000,
+    });
+
+    expect(adapter).toBeInstanceOf(MeshCoreAdapter);
+    expect(
+      (adapter as unknown as { connection: unknown }).connection
+    ).toBeInstanceOf(MeshCoreTcpConnection);
   });
 });
 

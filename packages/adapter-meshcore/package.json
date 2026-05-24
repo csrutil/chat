@@ -1,7 +1,7 @@
 {
   "name": "@chat-adapter/meshcore",
   "version": "4.28.1",
-  "description": "MeshCore serial adapter for chat",
+  "description": "MeshCore adapter for chat over serial or TCP",
   "type": "module",
   "engines": {
     "node": ">=20"

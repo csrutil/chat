@@ -124,6 +124,14 @@ export interface MeshCoreAdapterConfig {
    */
   syncDeviceTime?: boolean;
   /**
+   * TCP host or IP address. Falls back to MESHCORE_TCP_HOST.
+   */
+  tcpHost?: string;
+  /**
+   * TCP port. Falls back to MESHCORE_TCP_PORT, then 5000.
+   */
+  tcpPort?: number;
+  /**
    * Bot username override. Falls back to the Chat userName.
    */
   userName?: string;
@@ -133,10 +141,30 @@ export interface MeshCoreSerialPortLike {
   close(callback?: (error?: Error | null) => void): void;
   drain?(callback?: (error?: Error | null) => void): void;
   isOpen?: boolean;
+  off(event: "close" | "open", listener: () => void): this;
+  off(event: "data", listener: (data: Uint8Array) => void): this;
+  off(event: "error", listener: (error: Error) => void): this;
   on(event: "close" | "open", listener: () => void): this;
   on(event: "data", listener: (data: Uint8Array) => void): this;
   on(event: "error", listener: (error: Error) => void): this;
   open(callback?: (error?: Error | null) => void): void;
+  write(
+    data: Uint8Array,
+    callback?: (error?: Error | null) => void
+  ): boolean | undefined;
+}
+
+export interface MeshCoreTcpSocketLike {
+  connect(port: number, host: string): this;
+  destroy(): void;
+  off(event: "close" | "connect", listener: () => void): this;
+  off(event: "data", listener: (data: Uint8Array) => void): this;
+  off(event: "error", listener: (error: Error) => void): this;
+  on(event: "close" | "connect", listener: () => void): this;
+  on(event: "data", listener: (data: Uint8Array) => void): this;
+  on(event: "error", listener: (error: Error) => void): this;
+  once(event: "connect", listener: () => void): this;
+  once(event: "error", listener: (error: Error) => void): this;
   write(
     data: Uint8Array,
     callback?: (error?: Error | null) => void

@@ -11,6 +11,7 @@ import {
   shortMessageHash,
 } from "./protocol";
 import { MeshCoreSerialConnection } from "./serial-connection";
+import { DEFAULT_TCP_PORT, MeshCoreTcpConnection } from "./tcp-connection";
 import type {
   MeshCoreAdapterConfig,
   MeshCoreChannelMessage,
@@ -21,6 +22,7 @@ import type {
   MeshCoreWaitingMessage,
 } from "./types";
 
+export { MeshCoreFramedConnection } from "./connection";
 export { MeshCoreFormatConverter } from "./markdown";
 export {
   BufferReader,
@@ -29,6 +31,7 @@ export {
   parseFrame,
 } from "./protocol";
 export { MeshCoreSerialConnection } from "./serial-connection";
+export { DEFAULT_TCP_PORT, MeshCoreTcpConnection } from "./tcp-connection";
 export type {
   MeshCoreAdapterConfig,
   MeshCoreChannel,
@@ -40,6 +43,7 @@ export type {
   MeshCoreRawMessage,
   MeshCoreSentResponse,
   MeshCoreSerialPortLike,
+  MeshCoreTcpSocketLike,
   MeshCoreThreadId,
   MeshCoreWaitingMessage,
 } from "./types";
@@ -85,11 +89,29 @@ export class MeshCoreAdapter
       return;
     }
 
+    const tcpHost = config.tcpHost ?? process.env.MESHCORE_TCP_HOST;
     const serialPort = config.serialPort ?? process.env.MESHCORE_SERIAL_PORT;
+
+    if (tcpHost && serialPort) {
+      throw new ValidationError(
+        MESHCORE_ADAPTER_NAME,
+        "Configure either tcpHost or serialPort for MeshCore, not both."
+      );
+    }
+
+    if (tcpHost) {
+      this.connection = new MeshCoreTcpConnection({
+        host: tcpHost,
+        logger: this.logger,
+        port: config.tcpPort ?? readTcpPortFromEnv() ?? DEFAULT_TCP_PORT,
+      });
+      return;
+    }
+
     if (!serialPort) {
       throw new ValidationError(
         MESHCORE_ADAPTER_NAME,
-        "serialPort is required. Set MESHCORE_SERIAL_PORT or provide it in config."
+        "serialPort or tcpHost is required. Set MESHCORE_SERIAL_PORT, MESHCORE_TCP_HOST, or provide one in config."
       );
     }
 
@@ -430,6 +452,22 @@ export class MeshCoreAdapter
       attachments: [],
     });
   }
+}
+
+function readTcpPortFromEnv(): number | null {
+  const value = process.env.MESHCORE_TCP_PORT;
+  if (!value) {
+    return null;
+  }
+
+  const port = Number(value);
+  if (!Number.isInteger(port) || port <= 0 || port > 65_535) {
+    throw new ValidationError(
+      MESHCORE_ADAPTER_NAME,
+      `Invalid MESHCORE_TCP_PORT: ${value}`
+    );
+  }
+  return port;
 }
 
 export function createMeshCoreAdapter(

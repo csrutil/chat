@@ -1,10 +1,10 @@
 ---
 title: MeshCore
-description: MeshCore Companion Radio adapter for Chat SDK over Node serial.
+description: MeshCore Companion Radio adapter for Chat SDK over Node serial or TCP.
 packageName: "@chat-adapter/meshcore"
 slug: meshcore
 type: platform
-tagline: Connect a Chat SDK bot to a local MeshCore Companion Radio over USB serial, with support for direct contact messages and channel messages.
+tagline: Connect a Chat SDK bot to a MeshCore Companion Radio over USB serial or TCP, with support for direct contact messages and channel messages.
 beta: true
 features:
   postMessage: yes
@@ -83,7 +83,31 @@ bot.onDirectMessage(async (thread, message) => {
 });
 ```
 
-MeshCore is not webhook based. The adapter opens the serial port during Chat initialization, syncs the radio clock, sends a flood advert, and drains waiting text messages into Chat SDK handlers.
+For TCP/WiFi Companion Radio firmware, configure the host instead:
+
+```bash
+export MESHCORE_TCP_HOST=10.1.0.226
+export MESHCORE_TCP_PORT=5000
+```
+
+```typescript title="lib/bot.ts" lineNumbers
+import { Chat } from "chat";
+import { createMeshCoreAdapter } from "@chat-adapter/meshcore";
+import { createMemoryState } from "@chat-adapter/state-memory";
+
+export const bot = new Chat({
+  userName: "mybot",
+  adapters: {
+    meshcore: createMeshCoreAdapter({
+      tcpHost: "10.1.0.226",
+      tcpPort: 5000,
+    }),
+  },
+  state: createMemoryState(),
+});
+```
+
+MeshCore is not webhook based. The adapter opens the configured serial or TCP connection during Chat initialization, syncs the radio clock, sends a flood advert, and drains waiting text messages into Chat SDK handlers.
 
 ## Configuration
 
@@ -93,6 +117,17 @@ MeshCore is not webhook based. The adapter opens the serial port during Chat ini
       type: "string",
       description:
         "USB serial port path. Auto-detected from `MESHCORE_SERIAL_PORT`.",
+    },
+    tcpHost: {
+      type: "string",
+      description:
+        "TCP host or IP address. Auto-detected from `MESHCORE_TCP_HOST`.",
+    },
+    tcpPort: {
+      type: "number",
+      default: "5000",
+      description:
+        "TCP port. Auto-detected from `MESHCORE_TCP_PORT` when set.",
     },
     baudRate: {
       type: "number",
